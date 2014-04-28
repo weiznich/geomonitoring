@@ -6,10 +6,11 @@ Bestimmung der Rotation und Translation von Punktwolken.
 
 #Teammitglieder
 * Georg Semmler
+* Michael Reinhold
 
 # License
 
-Copyright (c) 2014 Georg Semmler
+Copyright (c) 2014 Georg Semmler, Michael Reinhold
 
 
     This program is free software: you can redistribute it and/or modify

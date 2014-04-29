@@ -49,7 +49,7 @@ std::istream& PlyParser::safeGetline(std::istream& is, std::string& t)
 	}
 }
 bool PlyParser::checkValidFile(std::vector<std::string>& lines,
-		int& vertexCount)
+		size_t& vertexCount)
 {
 	bool isValidFile = true;
 	size_t counter = 0;
@@ -155,34 +155,38 @@ pcl::PointCloud<pcl::PointXYZRGBNormal> PlyParser::parse(
 			}
 		}
 		ply.close();
-		int vertexCount = 0;
+		size_t vertexCount = 0;
 		bool isValidFile = checkValidFile(lines, vertexCount);
 		if (isValidFile) {
 			points.width = vertexCount;
 			std::string line;
-
-			for (size_t i = 13; i < lines.size(); i++) {
-				std::string& line = lines[i];
-				std::vector<std::string> parts;
-				boost::algorithm::split(parts, line,
-						boost::algorithm::is_any_of(" "),
-						boost::algorithm::token_compress_on);
-				if (parts.size() == 9) {
-					Point p;
-					for (auto& s : parts) {
-						boost::algorithm::trim(s);
+			if (vertexCount == lines.size() - 13) {
+				for (size_t i = 13; i < lines.size(); i++) {
+					std::string& line = lines[i];
+					std::vector<std::string> parts;
+					boost::algorithm::split(parts, line,
+							boost::algorithm::is_any_of(" "),
+							boost::algorithm::token_compress_on);
+					if (parts.size() == 9) {
+						Point p;
+						for (auto& s : parts) {
+							boost::algorithm::trim(s);
+						}
+						readCoordinates(p, parts);
+						readNormal(p, parts);
+						readColor(p, parts);
+						points.push_back(p);
+					} else {
+						std::cerr << "not enough properties" << std::endl;
+						std::cerr << "only " << parts.size()
+								<< " properties found" << std::endl;
 					}
-					readCoordinates(p, parts);
-					readNormal(p, parts);
-					readColor(p, parts);
-					points.push_back(p);
-				} else {
-					std::cerr << "not enough properties" << std::endl;
-					std::cerr << "only " << parts.size() << " properties found"
-							<< std::endl;
 				}
+				return points;
+			} else {
+				std::cerr << "vertex count does not match actual line count"
+						<< std::endl;
 			}
-			return points;
 		} else {
 			std::cerr << filepath << "is not a falid file " << std::endl;
 		}

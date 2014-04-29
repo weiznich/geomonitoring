@@ -29,7 +29,7 @@ public:
 private:
 	static std::istream& safeGetline(std::istream& is, std::string& t);
 	static bool checkValidFile(std::vector<std::string>& lines,
-			int& vertexCount);
+			size_t& vertexCount);
 	static void readCoordinates(pcl::PointXYZRGBNormal& p,
 			const std::vector<std::string>& parts);
 	static void readNormal(pcl::PointXYZRGBNormal& p,

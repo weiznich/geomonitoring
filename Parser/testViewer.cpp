@@ -13,7 +13,7 @@
 
 int main(int argc, char** argv)
 {
-
+	pcl::visualization::CloudViewer viewer("Clouds");
 	for (int i = 1; i < argc; i++) {
 		std::string path(argv[i]);
 		pcl::PointCloud<pcl::PointXYZRGBNormal> cloud=Parser::PlyParser::parse(path);
@@ -28,11 +28,11 @@ int main(int argc, char** argv)
 			copy.push_back(pt);
 		}
 		copy.width=cloud.width;
-		pcl::visualization::CloudViewer viewer(path);
-		viewer.showCloud(boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>(copy));
-		while (!viewer.wasStopped()) {
-			//wait to close
-		}
+		viewer.showCloud(copy.makeShared(),std::string(argv[i]));
+
+	}
+	while (!viewer.wasStopped()) {
+		//wait to close
 	}
 	return 1;
 }

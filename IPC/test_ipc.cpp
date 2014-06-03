@@ -30,7 +30,7 @@ int main(int argc,char** argv){
 	pcl::PointCloud<pcl::PointXYZRGBNormal> initial=Parser::PlyParser::parse(std::string(argv[1]));
 	pcl::PointCloud<pcl::PointXYZRGBNormal> target=Parser::PlyParser::parse(std::string(argv[2]));
 	Eigen::Matrix4f transformation;
-	Calculation::runIPC(initial,target,transformation);
+	//Calculation::runIPC(initial,target,transformation);
 
 
 }

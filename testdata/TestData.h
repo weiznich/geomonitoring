@@ -24,11 +24,12 @@ class TestData
 public:
 	template<typename PointT>
 	static void getTrafo(const pcl::PointCloud<PointT>& source,
-			Eigen::Matrix4f& trafo, pcl::PointCloud<PointT>& targetCloud)
+			Eigen::Matrix4f& trafo, pcl::PointCloud<PointT>* targetCloud)
 	{
-		targetCloud = pcl::PointCloud<PointT>();
+		delete targetCloud;
+		targetCloud = new pcl::PointCloud<PointT>();
 		for(auto p:source){
-			targetCloud.push_back(p);
+			targetCloud->push_back(p);
 		}
 		Eigen::Matrix4f rot;
 		float alpha = randomFloat(-0.1,0.1);
@@ -48,7 +49,7 @@ public:
 		std::cout << "Rotation: " << std::endl << rot << std::endl;
 		std::cout << "Translation: " << d[0] << " , " << d[1] << " , " << d[2]
 				<< std::endl;
-		for (auto& p : targetCloud) {
+		for (auto& p : targetCloud->points) {
 			Eigen::Vector4f norm;
 			norm<<p.x,p.y,p.z,1;
 			norm=rot*norm;

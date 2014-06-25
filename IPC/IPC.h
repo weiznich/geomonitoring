@@ -73,13 +73,13 @@ typedef pcl::PointCloud<PointT> PointCloud;
 typedef pcl::PointNormal PointNormalT;
 typedef pcl::PointCloud<PointNormalT> PointCloudWithNormals;
 
-bool runIPC(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr initial,
-		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr target,
-		Eigen::Matrix4f& transformation, bool debug = false)
+bool runIPC(PointCloudT::Ptr initial,
+		PointCloudT::Ptr target,
+		Eigen::Matrix4f& transformation, bool debug = false,PointCloudT::Ptr final=nullptr)
 {
 	//pcl::IterativeClosestPointNonLinear<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> icp;
-	pcl::IterativeClosestPoint<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> icp;
-	pcl::PointCloud<pcl::PointXYZRGBNormal> Final;
+	pcl::IterativeClosestPoint<PointNT, PointNT> icp;
+	PointCloudT Final;
 	bool ret = false;
 	if (debug)
 		setVerbosityLevel(pcl::console::L_DEBUG);
@@ -112,6 +112,9 @@ bool runIPC(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr initial,
 		std::cout << "does not converge" << std::endl;
 	}
 	std::cout << "befor return" << std::endl;
+	if(final!=nullptr){
+		final=PointCloudT::Ptr(&Final);
+	}
 	return ret;
 }
 
@@ -322,15 +325,15 @@ void test(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input,
 			pn.curvature=p.curvature;
 			object->push_back(pn);
 		}
-
-	pcl::console::print_highlight("Downsampling...\n");
-	pcl::VoxelGrid<PointNT> grid;
 	const float leaf = 0.005f;
+	/*pcl::console::print_highlight("Downsampling...\n");
+	pcl::VoxelGrid<PointNT> grid;
+
 	grid.setLeafSize(leaf, leaf, leaf);
 	grid.setInputCloud(object);
 	grid.filter(*object);
 	grid.setInputCloud(scene);
-	grid.filter(*scene);
+	grid.filter(*scene);*/
 	// Estimate normals for scene
 	pcl::console::print_highlight("Estimating scene normals...\n");
 	pcl::NormalEstimationOMP<PointNT, PointNT> nest;
@@ -349,6 +352,8 @@ void test(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input,
 	fest.setInputNormals(scene);
 	fest.compute(*scene_features);
 
+
+
 	// Perform alignment
 	pcl::console::print_highlight("Starting alignment...\n");
 	pcl::SampleConsensusPrerejective<PointNT, PointNT, FeatureT> align;
@@ -359,7 +364,7 @@ void test(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input,
 	align.setNumberOfSamples(3); // Number of points to sample for generating/prerejecting a pose
 	align.setCorrespondenceRandomness(2); // Number of nearest features to use
 	align.setSimilarityThreshold(0.6f); // Polygonal edge length similarity threshold
-	align.setMaxCorrespondenceDistance(1.5f * leaf); // Set inlier threshold
+	align.setMaxCorrespondenceDistance(1.5f /** leaf*/); // Set inlier threshold
 	align.setInlierFraction(0.25f); // Set required inlier fraction
 	align.align(*object_aligned);
 
@@ -383,15 +388,29 @@ void test(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input,
 		pcl::console::print_info("Inliers: %i/%i\n", align.getInliers().size(),
 				object->size());
 
-		// Show alignment
 		pcl::visualization::PCLVisualizer visu("Alignment");
 		visu.addPointCloud(scene, ColorHandlerT(scene, 0.0, 255.0, 0.0),
 				"scene");
+		visu.addPointCloud(object,ColorHandlerT(object, 255.0, 0.0, 0),
+				"object");
 		visu.addPointCloud(object_aligned,
 				ColorHandlerT(object_aligned, 0.0, 0.0, 255.0),
 				"object_aligned");
+
+		auto final=PointCloudT::Ptr(new PointCloudT);
+		runIPC(scene,object_aligned,transformation,true,final);
+
+		// Show alignment
+		visu=pcl::visualization::PCLVisualizer("Alignment");
+		visu.addPointCloud(scene, ColorHandlerT(scene, 0.0, 255.0, 0.0),
+				"scene");
+		visu.addPointCloud(object,ColorHandlerT(object, 255.0, 0.0, 0),
+				"object");
+		visu.addPointCloud(final,
+				ColorHandlerT(final, 0.0, 0.0, 255.0),
+				"object_aligned");
 		visu.spin();
-		runIPC(input,target,transformation,true);
+		//
 	} else {
 		pcl::console::print_error("Alignment failed!\n");
 	}

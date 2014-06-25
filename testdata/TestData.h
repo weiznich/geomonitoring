@@ -32,7 +32,7 @@ public:
 			targetCloud->push_back(p);
 		}
 		Eigen::Matrix4f rot;
-		float alpha = randomFloat(-0.1,0.1);
+		float alpha = randomFloat(-1,1);
 		std::cout<<"alpha "<<alpha<<std::endl;
 		float n[3]={0,0,0};
 		float d[3]={0,0,0};

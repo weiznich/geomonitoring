@@ -5,6 +5,6 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 
-ADD_EXECUTABLE( testIPC test_ipc.cpp  )
+ADD_EXECUTABLE( ICP run_icp.cpp  )
 
-TARGET_LINK_LIBRARIES( testIPC parser ${PCL_LIBRARIES})
+TARGET_LINK_LIBRARIES( ICP parser ${PCL_LIBRARIES})

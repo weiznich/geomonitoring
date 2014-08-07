@@ -17,10 +17,16 @@
 
 namespace Parser
 {
+
+/*
+ * Simple wrapper class for PYLParser
+ */
 class PlyParser
 {
 public:
 	/*
+	 * This function parsers a ply-file to a PCL-Pointcloud of the point type PointXYZRGBNormal
+	 *
 	 * @param filePath the path of the ply-file which should be parsed
 	 * @return the content of the file as unstructured pcl::PointCloud
 	 */

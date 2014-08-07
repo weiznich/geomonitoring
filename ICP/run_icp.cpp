@@ -15,30 +15,43 @@
 #include "../Parser/PlyParser.h"
 #include "ICP.h"
 
-void copyCloud(const pcl::PointCloud<pcl::PointXYZRGBNormal>* cloud,
-		pcl::PointCloud<pcl::PointXYZRGBNormal>* input)
+/*
+ * This function copy PCL pointclouds from input to output
+ *
+ * @param input, the cloud which should be copied
+ *
+ * @param output, the copied cloud, output
+ */
+void copyCloud(const pcl::PointCloud<pcl::PointXYZRGBNormal>* input,
+		pcl::PointCloud<pcl::PointXYZRGBNormal>* output)
 {
-	for (auto p : cloud->points) {
-		input->push_back(p);
+	for (auto p : input->points) {
+		output->push_back(p);
 	}
 }
 
+
+//mainfunction
 int main(int argc, char** argv)
 {
+	//check arguments
 	if (argc != 3) {
-		std::cerr << "No filename passed" << std::endl;
+		std::cerr << "call "<<argv[0]<<" <path to inputcloud> <path to targetcloud>" << std::endl;
 		return 0;
 	}
+	//read inputcloud
 	auto cloud = Parser::PlyParser::parse(std::string(argv[1]));
 	pcl::PointCloud<pcl::PointXYZRGBNormal>* input =
 				new pcl::PointCloud<pcl::PointXYZRGBNormal>();
 	copyCloud(&cloud, input);
 
+	//read target cloud
 	cloud = Parser::PlyParser::parse(std::string(argv[2]));
 	pcl::PointCloud<pcl::PointXYZRGBNormal>* target =
 					new pcl::PointCloud<pcl::PointXYZRGBNormal>();
 	copyCloud(&cloud, target);
-	std::cout<<"target points: "<<target->size()<<std::endl;
+
+	//calculate transformation
 	auto trafo=Calculation::getTransformation(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(input),
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(target));
 	std::cout << "Final transformation: " << std::endl << trafo

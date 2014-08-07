@@ -112,7 +112,7 @@ const Eigen::Matrix4f runICP(PointCloudT::Ptr initial, PointCloudT::Ptr target,
  *
  * @param input: the initial point cloud
  * @param target: the target point cloud
- * @param debug: flag to specify the debug level
+ * @param debug: flag to specify the debug level, 0= no Debug log, 1 = showing to clouds, >1 showing pcl debuglog
  *
  * @return The transformation between the point clouds
  *
@@ -122,6 +122,9 @@ const Eigen::Matrix4f getTransformation(
 		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr target, const short debug =
 				0)
 {
+	if (debug > 1) {
+		setVerbosityLevel(pcl::console::L_DEBUG);
+	}
 
 	FeatureCloudT::Ptr object_features(new FeatureCloudT);
 	FeatureCloudT::Ptr scene_features(new FeatureCloudT);
@@ -129,6 +132,7 @@ const Eigen::Matrix4f getTransformation(
 	PointCloudT::Ptr object_aligned(new PointCloudT);
 	PointCloudT::Ptr scene(new PointCloudT);
 
+	//transform the pointtype
 	for (auto p : input->points) {
 		PointNT pn;
 		pn.x = p.x;

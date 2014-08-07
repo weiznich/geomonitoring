@@ -15,10 +15,10 @@
 #include "../Parser/PlyParser.h"
 #include "ICP.h"
 
-void copyCloud(pcl::PointCloud<pcl::PointXYZRGBNormal> cloud,
+void copyCloud(const pcl::PointCloud<pcl::PointXYZRGBNormal>* cloud,
 		pcl::PointCloud<pcl::PointXYZRGBNormal>* input)
 {
-	for (auto p : cloud) {
+	for (auto p : cloud->points) {
 		input->push_back(p);
 	}
 }
@@ -32,12 +32,12 @@ int main(int argc, char** argv)
 	auto cloud = Parser::PlyParser::parse(std::string(argv[1]));
 	pcl::PointCloud<pcl::PointXYZRGBNormal>* input =
 				new pcl::PointCloud<pcl::PointXYZRGBNormal>();
-	copyCloud(cloud, input);
+	copyCloud(&cloud, input);
 
 	cloud = Parser::PlyParser::parse(std::string(argv[2]));
 	pcl::PointCloud<pcl::PointXYZRGBNormal>* target =
 					new pcl::PointCloud<pcl::PointXYZRGBNormal>();
-	copyCloud(cloud, target);
+	copyCloud(&cloud, target);
 	std::cout<<"target points: "<<target->size()<<std::endl;
 	auto trafo=Calculation::getTransformation(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(input),
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(target));

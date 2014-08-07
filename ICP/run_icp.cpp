@@ -22,7 +22,7 @@
  *
  * @param output, the copied cloud, output
  */
-void copyCloud(const pcl::PointCloud<pcl::PointXYZRGBNormal>* input,
+void copyCloud(const pcl::PointCloud<pcl::PointXYZRGBNormal>* const input,
 		pcl::PointCloud<pcl::PointXYZRGBNormal>* output)
 {
 	for (auto p : input->points) {

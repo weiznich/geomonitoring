@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 	copyCloud(&cloud, target);
 
 	//calculate transformation
-	auto trafo=Calculation::getTransformation(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(input),
+	auto trafo=Calculation::ICP::getTransformation(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(input),
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(target));
 	std::cout << "Final transformation: " << std::endl << trafo
 			<< std::endl;

@@ -137,14 +137,14 @@ void PlyParser::readColor(pcl::PointXYZRGBNormal& p,
 }
 
 pcl::PointCloud<pcl::PointXYZRGBNormal> PlyParser::parse(
-		const std::string& filepath)
+		const std::string& filePath)
 {
 	using namespace pcl;
 	typedef PointXYZRGBNormal Point;
 	typedef PointCloud<Point> Points;
 	Points points;
 	points.height = 0;	//PointCloud is unstructured
-	std::ifstream ply(filepath);
+	std::ifstream ply(filePath);
 	if (ply.is_open()) {
 		std::string line;
 		std::vector<std::string> lines;
@@ -188,11 +188,11 @@ pcl::PointCloud<pcl::PointXYZRGBNormal> PlyParser::parse(
 						<< std::endl;
 			}
 		} else {
-			std::cerr << filepath << "is not a falid file " << std::endl;
+			std::cerr << filePath << "is not a falid file " << std::endl;
 		}
 
 	} else {
-		std::cerr << "Could not open " << filepath << std::endl;
+		std::cerr << "Could not open " << filePath << std::endl;
 	}
 	points.width = 0;
 	return points;

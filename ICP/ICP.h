@@ -49,18 +49,26 @@ using pcl::visualization::PointCloudColorHandlerGenericField;
 using pcl::visualization::PointCloudColorHandlerCustom;
 
 /**
+ * Wrapperclass for Iterative Closest Point Calculations
+ */
+class ICP{
+public:
+/**
  * Calculate the transformation between two point clouds using icp
  * WARNING: Only use this if the point clouds are near
  *
- * @param initial: The initial point cloud
- * @param target: The target point cloud
- * @param debug: flag to specify the debug level
- * @return-param final: The final aligain pointcloud
+ * @param initial The initial point cloud
+ * @param target The target point cloud
+ * @param debug flag to specify the debug level
+ *         - 0 no Debug log
+ *         - 1 showing to clouds in viewer
+ *         - >1 showing pcl debuglog
+ * @param final The final aligned pointcloud
  *
  * @return the transformation
  *
  */
-const Eigen::Matrix4f runICP(PointCloudT::Ptr initial, PointCloudT::Ptr target,
+const static Eigen::Matrix4f runICP(PointCloudT::Ptr initial, PointCloudT::Ptr target,
 		short debug = 0, PointCloudT::Ptr final = nullptr)
 {
 	pcl::IterativeClosestPoint<PointNT, PointNT> icp;
@@ -110,14 +118,17 @@ const Eigen::Matrix4f runICP(PointCloudT::Ptr initial, PointCloudT::Ptr target,
  * Calculate the transformation between two point clouds using
  * first a simple feature matching strategy and then icp
  *
- * @param input: the initial point cloud
- * @param target: the target point cloud
- * @param debug: flag to specify the debug level, 0= no Debug log, 1 = showing to clouds, >1 showing pcl debuglog
+ * @param input the initial point cloud
+ * @param target the target point cloud
+ * @param debug flag to specify the debug level
+ *         - 0 no Debug log
+ *         - 1 showing to clouds in viewer
+ *         - >1 showing pcl debuglog
  *
  * @return The transformation between the point clouds
  *
  */
-const Eigen::Matrix4f getTransformation(
+const static Eigen::Matrix4f getTransformation(
 		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input,
 		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr target, const short debug =
 				0)
@@ -266,6 +277,7 @@ const Eigen::Matrix4f getTransformation(
 	pcl::console::print_error("Alignment failed!\n");
 	return Eigen::Matrix4f();
 }
+};
 }
 
 #endif /* IPC_H_ */

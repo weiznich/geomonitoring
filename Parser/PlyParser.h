@@ -18,20 +18,20 @@
 namespace Parser
 {
 
-/*
+/**
  * Simple wrapper class for PYLParser
  */
 class PlyParser
 {
 public:
-	/*
+	/**
 	 * This function parsers a ply-file to a PCL-Pointcloud of the point type PointXYZRGBNormal
 	 *
 	 * @param filePath the path of the ply-file which should be parsed
 	 * @return the content of the file as unstructured pcl::PointCloud
 	 */
 	static pcl::PointCloud<pcl::PointXYZRGBNormal> parse(
-			const std::string& filepath);
+			const std::string& filePath);
 private:
 	static std::istream& safeGetline(std::istream& is, std::string& t);
 	static bool checkValidFile(std::vector<std::string>& lines,

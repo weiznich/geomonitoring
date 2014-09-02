@@ -14,6 +14,7 @@
 #include <cmath>
 
 #include <boost/make_shared.hpp>
+#include <boost/optional.hpp>
 #include <Eigen/Core>
 
 #include <pcl/point_types.h>
@@ -32,6 +33,10 @@
 #include <pcl/console/print.h>
 
 #include <pcl/segmentation/sac_segmentation.h>
+
+#include <pcl/io/ply_io.h>
+
+#define BINARY true
 
 
 // Types
@@ -69,7 +74,7 @@ public:
  *
  */
 const static Eigen::Matrix4f runICP(PointCloudT::Ptr initial, PointCloudT::Ptr target,
-		short debug = 0, PointCloudT::Ptr final = nullptr)
+		const unsigned short debug = 0, PointCloudT::Ptr final = nullptr)
 {
 	pcl::IterativeClosestPoint<PointNT, PointNT> icp;
 	PointCloudT Final;
@@ -120,6 +125,9 @@ const static Eigen::Matrix4f runICP(PointCloudT::Ptr initial, PointCloudT::Ptr t
  *
  * @param input the initial point cloud
  * @param target the target point cloud
+ * @param output_path the path+the basefilename where the final cloud will be outputed
+ * 			this creates two files, one with the final cloud, one with the final aligned cloud
+ * 			 and the cloud to which should be aligned
  * @param debug flag to specify the debug level
  *         - 0 no Debug log
  *         - 1 showing to clouds in viewer
@@ -130,7 +138,7 @@ const static Eigen::Matrix4f runICP(PointCloudT::Ptr initial, PointCloudT::Ptr t
  */
 const static Eigen::Matrix4f getTransformation(
 		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input,
-		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr target, const short debug =
+		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr target,boost::optional<std::string> output_path=boost::none, const unsigned short debug =
 				0)
 {
 	if (debug > 1) {
@@ -271,6 +279,41 @@ const static Eigen::Matrix4f getTransformation(
 			visu.addPointCloud(final, ColorHandlerT(final, 0.0, 0.0, 255.0),
 					"object_aligned");
 			visu.spin();
+		}
+
+		//output
+		if(output_path){
+			pcl::PLYWriter writer;
+			writer.write<PointNT>(output_path.get()+"_final.ply",*final.get(),BINARY);
+			typedef pcl::PointXYZRGBNormal PointRGB;
+			pcl::PointCloud<PointRGB> all;
+			for(auto && p:scene->points){
+				PointRGB pn;
+				pn.normal_x=p.normal_x;
+				pn.normal_y=p.normal_y;
+				pn.normal_z=p.normal_z;
+				pn.x=p.x;
+				pn.y=p.y;
+				pn.z=p.z;
+				pn.r=0;
+				pn.g=255;
+				pn.b=0;
+				all.push_back(pn);
+			}
+			for(auto && p:final->points){
+				PointRGB pn;
+				pn.normal_x=p.normal_x;
+				pn.normal_y=p.normal_y;
+				pn.normal_z=p.normal_z;
+				pn.x=p.x;
+				pn.y=p.y;
+				pn.z=p.z;
+				pn.r=0;
+				pn.g=0;
+				pn.b=255;
+				all.push_back(pn);
+			}
+			writer.write<PointRGB>(output_path.get()+"_all.ply",all,BINARY);
 		}
 		return transformation*trafo;
 	}

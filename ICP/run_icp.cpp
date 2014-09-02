@@ -35,9 +35,14 @@ void copyCloud(const pcl::PointCloud<pcl::PointXYZRGBNormal>* const input,
 int main(int argc, char** argv)
 {
 	//check arguments
-	if (argc != 3) {
-		std::cerr << "call "<<argv[0]<<" <path to inputcloud> <path to targetcloud>" << std::endl;
+	if (argc <3 || argc>4) {
+		std::cout<<argc<<std::endl;
+		std::cerr << "call "<<argv[0]<<" <path to inputcloud> <path to targetcloud> [<outputpath>]" << std::endl;
 		return 0;
+	}
+	boost::optional<std::string> output_path=boost::none;
+	if(argc==4){
+		output_path=std::string(argv[3]);
 	}
 	//read inputcloud
 	auto cloud = Parser::PlyParser::parse(std::string(argv[1]));
@@ -53,7 +58,7 @@ int main(int argc, char** argv)
 
 	//calculate transformation
 	auto trafo=Calculation::ICP::getTransformation(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(input),
-			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(target));
+			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(target),output_path);
 	std::cout << "Final transformation: " << std::endl << trafo
 			<< std::endl;
 
